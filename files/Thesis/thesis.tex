@@ -1,0 +1,59 @@
+% !TEX TS-program = lualatex
+
+\documentclass[oneside, a5paper,10pt]{article}
+\usepackage{System/core}
+
+\input{System/newcommand}
+
+\begin{document}
+
+\addAuthor{\textbf{\small Донецков Андрей Дмитриевич}}{НИЯУ МИФИ}{andrey.donetskov@gmail.com}
+\addAuthor{Бакакин Валерий Дмитриевич}{}{}
+\addAuthor{Жулев Егор Михайлович}{}{}
+
+\makeInf
+{Влияние формулировки задачи на решение методом PINN}
+{Целью работы является анализ влияния различных формулировок задачи Коши для уравнения гармонического осциллятора с вынуждающей силой на эффективность и точность решений. Проведённые эксперименты показали влияние постановки задачи на сходимость нейронной сети и вычислительные затраты.}
+{Ключевые слова: гармонический осциллятор, PINN.}
+{\section*{Постановка задачи}
+Рассматриваются три постановки задачи Коши:
+
+\textbf{1. ОДУ второго порядка:}
+\begin{equation}
+\label{DonetskovAD-ODE2}
+\frac{d^2x}{dt^2} + \omega_0^2 x = -A\cos(\omega t), \quad x(0) = x_0, \quad \frac{dx}{dt}(0) = v_0.
+\end{equation}
+
+\textbf{2. Система ОДУ первого порядка:}
+\begin{equation}
+\label{DonetskovAD-ODE1}
+\frac{dx}{dt} = y, \quad \frac{dy}{dt} = -\omega_0^2 x - A\cos(\omega t), \quad x(0) = x_0, \quad y(0) = v_0.
+\end{equation}
+
+\textbf{3. Альтернативная система ОДУ:}
+\begin{equation}
+\label{DonetskovAD-AltODE}
+\frac{dx}{dt} = \omega y - \frac{A}{\omega} \sin(\omega t), \quad \frac{dy}{dt} = -\omega x, \quad x(0) = x_0, \quad y(0) = \frac{v_0}{\omega}.
+\end{equation}
+
+\section*{Методология}
+Физически-информированные нейронные сети (PINN) используются для аппроксимации решений \cite{bibl:raissi2019}. Функция потерь минимизирует отклонения от исходных уравнений и начальных условий \cite{bibl:lagaris1998}.
+
+\section*{Результаты}
+\Picture{stitched_image}{Функция потерь для альтернативной системы (слева), системы ОДУ первого порядка (в центре) и второго порядка (справа).}{0.6}
+
+Анализ графиков функции потерь показывает:
+\begin{itemize}
+    \item \textbf{ОДУ второго порядка} показывает наибольшую скорость сходимости и высокую точность, но часто выходит из локальных минимумов;
+    \item \textbf{Система ОДУ первого порядка} демонстрирует медленную скорость сходимости и меньшую точность, но стабильный процесс обучения;
+    \item \textbf{Альтернативная система ОДУ} обеспечивает точность, сопоставимую с первым случаем, при меньших колебаниях функции потерь.
+\end{itemize}
+
+Таким образом, выбор формулировки задачи влияет на характер сходимости и вычислительные затраты.
+
+\begin{thebibliography}{9}
+    \bibitem{bibl:lagaris1998} \textit{Lagaris I.E., Likas A., Fotiadis D.I.} Artificial neural networks for solving ordinary and partial differential equations // IEEE Transactions on Neural Networks. \textbf{1998}. \textit{9}(5): 987-1000.
+    \bibitem{bibl:raissi2019} \textit{Raissi M., Perdikaris P., Karniadakis G.E.} Physics-informed neural networks: A deep learning framework for solving forward and inverse problems involving nonlinear partial differential equations // Journal of Computational Physics. \textbf{2019}. \textit{378}: 686-707.
+\end{thebibliography}
+}
+\end{document}
