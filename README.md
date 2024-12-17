@@ -9,7 +9,7 @@
 1. **ОДУ второго порядка:**
    $$
    \begin{cases}
-   \frac{d^2x}{dt^2} + \omega_0^2 x = \cos(\omega t) \\
+   \frac{d^2x}{dt^2} + \omega_0^2 x = -A\cos(\omega t) \\
    x(0) = x_0 \\
    \frac{dx}{dt}(0) = v_0
    \end{cases}
@@ -19,7 +19,7 @@
    $$
    \begin{cases}
    \frac{dx}{dt} = y \\
-   \frac{dy}{dt} = -\omega_0^2 x + \cos(\omega t) \\
+   \frac{dy}{dt} = -\omega_0^2 x - A\cos(\omega t) \\
    x(0) = x_0 \\
    y(0) = v_0
    \end{cases}
@@ -28,7 +28,7 @@
 3. **Альтернативная система ОДУ первого порядка:**
    $$
    \begin{cases}
-   \frac{dx}{dt} = \omega_0 y + \frac{1}{\omega} \sin(\omega t) \\
+   \frac{dx}{dt} = \omega_0 y - \frac{A}{\omega} \sin(\omega t) \\
    \frac{dy}{dt} = -\omega_0 x \\
    x(0) = x_0 \\
    y(0) = \frac{v_0}{\omega_0}
