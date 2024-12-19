@@ -48,9 +48,9 @@
 ## Результаты
 На основании проведённых экспериментов были получены следующие результаты:
 
-- **ОДУ второго порядка:** Быстрая сходимость, меньшее число итераций. ![Loss_ODE_of_the_second_order](images/Loss_ODE_of_the_second_order.png)
-- **Система ОДУ первого порядка:** Более высокая точность на тестовых данных. ![Loss_ODE_of_the_first_order](images/Loss_ODE_of_the_first_order.png)
-- **Альтернативная система ОДУ:** Схожие результаты, но увеличенное время вычислений. ![Loss_alt_ODE](images/Loss_alt_ODE.png)
+- **ОДУ второго порядка:** показывает наибольшую скорость сходимости и высокую точность, но часто выходит из локальных минимумов. ![Loss_ODE_of_the_second_order](images/Loss&x_ODE_of_the_second_order.png)
+- **Система ОДУ первого порядка:** демонстрирует медленную скорость сходимости и меньшую точность, но стабильный процесс обучения. ![Loss_ODE_of_the_first_order](images/Loss&x_ODE_of_the_first_order.png)
+- **Альтернативная система ОДУ:** обеспечивает точность, сопоставимую с первым случаем, при меньших колебаниях функции потерь. ![Loss_alt_ODE](images/Loss&x_alt_ODE.png)
 
 ## Используемые технологии
 - **Язык программирования** Python.
@@ -62,8 +62,6 @@
 1. Lagaris I.E., Likas A., Fotiadis D.I. Artificial neural networks for solving ordinary and partial differential equations. //IEEE Transactions on Neural Networks, 1998. T. 9. № 5. С. 987–1000.
 2. Raissi M., Perdikaris P., Karniadakis G.E. Physics-informed neural networks: A deep learning framework for solving forward and inverse problems involving nonlinear partial differential equations. //Journal of Computational Physics, 2019. T. 378. С. 686–707.
 3. [PyTorch documentation](https://pytorch.org/docs/stable/index.html).
-4. [TensorFlow documentation](https://www.tensorflow.org/api_docs).
-5. [PyKAN GitHub Repository](https://kindxiaoming.github.io/pykan/).
 
 ## Запуск проекта
 
