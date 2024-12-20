@@ -168,3 +168,9 @@ cython_debug/
 *.fls
 *.fdb_latexmk
 *.synctex.gz
+*.nav
+*.snm
+*.toc
+*.bbl
+*.bcf
+*.run.xml

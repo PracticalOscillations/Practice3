@@ -1,0 +1,290 @@
+\documentclass{beamer}
+\usetheme{Madrid}
+\usepackage[utf8]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage[russian]{babel}
+\usepackage{amsmath, amssymb}
+\usepackage{graphicx}
+\usepackage{csquotes}
+\usepackage[style=gost-footnote,
+bibstyle=gost-footnote,
+language=russian,
+backend=biber
+]{biblatex}
+\addbibresource{bib.bib}
+
+\title{Исследование влияния вида задачи для уравнения гармонического осциллятора на решение PINN}
+\author{Донецков А.Д., Бакакин В.Д., Жулев Е.М.\\
+\textit{
+    Институт Лазерных и плазменных технологий\\
+    НИЯУ МИФИ\\
+    г. Москва
+}}
+\date{20 декабря 2024}
+
+\setbeamertemplate{footline}{%
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=.33\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+      Андрей, Валерий, Егор
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.33\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+      PINN для осциллятора
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.33\paperwidth,ht=2.25ex,dp=1ex,center]{date in head/foot}%
+      \insertshortdate
+    \end{beamercolorbox}%
+  }%
+  \vskip0pt%
+}
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\begin{frame}{Содержание}
+    \tableofcontents
+\end{frame}
+
+\section{Введение}
+\begin{frame}{Введение}
+    \begin{itemize}
+        \item Решение уравнений движения гармонического осциллятора важно в вычислительной физике и механике.
+        \item Гармонический осциллятор описывается дифференциальными уравнениями второго и первого порядка.
+        \item Развитие нейросетевых методов, особенно PINN.~\footcite{Lagaris1998,Raissi2019}
+        \item Цель: сравнить влияние различных формулировок задачи Коши на метод PINN.
+    \end{itemize}
+\end{frame}
+
+\section{Постановка задачи}
+\subsection{Система ОДУ второго порядка}
+\begin{frame}{ОДУ второго порядка}
+    \begin{equation}
+    \begin{cases}
+    \dfrac{d^2x}{dt^2} + \omega_0^2 x = -A\cos(\omega t), \\
+    x(0) = x_0, \\
+    \dfrac{dx}{dt}(0) = v_0.
+    \end{cases}
+    \end{equation}
+\end{frame}
+
+\subsection{Системы ОДУ первого порядка}
+\begin{frame}{Системы ОДУ первого порядка}
+    \begin{minipage}[t]{0.45\textwidth}
+        \begin{equation}
+            \begin{cases}
+            \dfrac{dx}{dt} = y, \\
+            \dfrac{dy}{dt} = -\omega_0^2 x - A\cos(\omega t), \\
+            x(0) = x_0, \\
+            y(0) = v_0.
+            \end{cases}
+        \end{equation}
+        \vspace{0.5cm}
+    \end{minipage}
+    \begin{minipage}[t]{0.45\textwidth}
+        \begin{equation}
+            \begin{cases}
+            \dfrac{dx}{dt} = \omega_0 y - \dfrac{A}{\omega}\sin(\omega t), \\
+            \dfrac{dy}{dt} = -\omega_0 x, \\
+            x(0) = x_0, \\
+            y(0) = \dfrac{v_0}{\omega_0}.
+            \end{cases}
+        \end{equation}
+    \end{minipage}
+
+    \begin{block}{Замечание}
+        Разные системы дифференциальных уравнений первого порядка могут быть полезны в случаях, когда форма упрощает аналитическое или численное решение, в зависимости от характера внешней силы или других факторов.
+    \end{block}
+
+\end{frame}
+
+\section{Ключевые особенности PINN}
+\begin{frame}{Преимущества PINN}
+    \begin{itemize}
+        \item Интеграция физических законов в процесс обучения.
+        \item Использование автоматического дифференцирования для вычисления градиентов.
+        \item Применимость к различным задачам: ОДУ, УЧП и их системы.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Ограничения PINN}
+    \begin{itemize}
+        \item Трудности с аппроксимацией разрывных функций.
+        \item Низкая эффективность при решении жестких и хаотических систем.
+        \item Застревание в локальных оптимумах.
+        \item Сложности в балансировке компонентов функции потерь.
+    \end{itemize}
+\end{frame}
+
+\section{Методология}
+\begin{frame}{Методология}
+    \begin{itemize}
+        \item Одинаковая конфигурация нейросети для всех 3 формулировок:
+        \begin{itemize}
+            \item Вход: время
+            \item 5 скрытых слоёв по 20 нейронов
+            \item Функция активации: синус
+            \item Выход: 1 или 2 нейрона
+        \end{itemize}
+        \item Обучение на интервале $[-5, 15]$ с шагом $0.05$
+        \item Функционал потерь: $loss = loss_{interior} + \lambda_{bc} * loss_{boundary}$, где $\lambda_{bc} = 50$
+        \item Оптимизатор: Adam с шагом обучения $10^{-3}$
+    \end{itemize}
+\end{frame}
+
+\section{Результаты}
+\subsection{ОДУ второго порядка.}
+\begin{frame}{ОДУ второго порядка}
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.9\textwidth]{images/Loss&x_ODE_of_the_second_order.png}
+        \caption{Функция потерь для ОДУ второго порядка}
+        \label{fig:loss_second_order}
+    \end{figure}
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.9\textwidth]{images/Loss&x_ODE_of_the_second_order_resonance.png}
+        \caption{Функция потерь для ОДУ второго порядка с резонансом}
+        \label{fig:loss_second_order_resonance}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{ОДУ второго порядка.}
+    \begin{itemize}
+        \item Высокая точность и быстрая сходимость.
+        \item Возможные проблемы с локальными минимумами.
+    \end{itemize}
+    \begin{table}[h!]
+        \centering
+        \begin{tabular}{|c|c|}
+        \hline
+        \textbf{MAE $x, 10^{-2}$} & \textbf{MAE $\dfrac{dx}{dt}, 10^{-2}$} \\
+        \hline
+        1,1879 & 2,4357 \\
+        1,2033 & 2,4247 \\
+        1,6343 & 3,0803 \\
+        1,2127 & 2,4514 \\
+        1,1406 & 2,3287 \\
+        \hline
+        \end{tabular}
+        \caption{ОДУ второго порядка без резонанса}
+    \end{table}
+
+    \begin{alertblock}{Важно!}
+        Прошу запомнить среднее значение MAE. Для $x \simeq 1.3$, для $\dfrac{dx}{dt} \simeq 2.5$.
+    \end{alertblock}
+\end{frame}
+
+\subsection{Система ОДУ первого порядка}
+\begin{frame}{Система ОДУ первого порядка}
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.9\textwidth]{images/Loss&x_ODE_of_the_first_order.png}
+        \caption{Функция потерь для системы ОДУ первого порядка}
+        \label{fig:loss_first_order}
+    \end{figure}
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.9\textwidth]{images/Loss&x_ODE_of_the_first_order_resonance.png}
+        \caption{Функция потерь для системы ОДУ первого порядка с резонансом}
+        \label{fig:loss_first_order_resonance}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Система ОДУ первого порядка с резонансом}
+    \begin{itemize}
+        \item Более стабильный, но медленный процесс обучения.
+        \item Менее точные результаты.
+    \end{itemize}
+    \begin{table}[h!]
+        \centering
+        \begin{tabular}{|c|c|}
+        \hline
+        \textbf{MAE $x, 10^{-2}$} & \textbf{MAE $y, 10^{-2}$} \\
+        \hline
+        4,8092 & 9,8869 \\
+        3,5429 & 7,2853 \\
+        3,6680 & 7,4666 \\
+        3,6264 & 7,4309 \\
+        2,5681 & 5,4567 \\
+        \hline
+        \end{tabular}
+        \caption{ОДУ первого порядка без резонанса}
+    \end{table}
+    \begin{block}{Вывод из таблицы}
+        Среднее MAE больше ОДУ второго порядка в 3 раза.
+    \end{block}
+\end{frame}
+
+\subsection{Альтернативная система ОДУ первого порядка}
+\begin{frame}{Альтернативная система ОДУ первого порядка}
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.9\textwidth]{images/Loss&x_alt_ODE.png}
+        \caption{Функция потерь для альтернативной системы ОДУ}
+        \label{fig:loss_alt}
+    \end{figure}
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.9\textwidth]{images/Loss&x_alt_ODE_resonance.png}
+        \caption{Функция потерь для альтернативной системы ОДУ с резонансом}
+        \label{fig:loss_alt_resonance}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Альтернативная система ОДУ первого порядка с резонансом}
+    \begin{itemize}
+        \item Большая точность по сравнению с первой системой.
+        \item Менее стабильный процесс обучения.
+    \end{itemize}
+    
+    \begin{table}[h!]
+        \centering
+        \begin{tabular}{|c|c|}
+        \hline
+        \textbf{MAE $x, 10^{-2}$} & \textbf{MAE $\dfrac{dx}{dt}, 10^{-2}$} \\
+        \hline
+        1,0991 & 2,3144 \\
+        2,4914 & 5,1818 \\
+        1,0468 & 2,2011 \\
+        0,44066 & 0,96563 \\
+        0,92337 & 1,9852 \\
+        \hline
+        \end{tabular}
+        \caption{Альтернативная система ОДУ первого порядка без резонанса}
+    \end{table}
+    \vspace{0.5cm}
+    \begin{block}{Вывод из таблицы}
+        Достигается точность, близкая к ОДУ второго порядка.
+    \end{block}
+\end{frame}
+
+\section{Выводы}
+\begin{frame}{Выводы}
+    \begin{itemize}
+        \item Выбор постановки задачи Коши существенно влияет на эффективность и точность PINN.
+        \item \textbf{ОДУ второго порядка:}
+        \begin{itemize}
+            \item Быстрая сходимость.
+            \item Возможны локальные минимумы.
+        \end{itemize}
+        \item \textbf{Системы ОДУ первого порядка:}
+        \begin{itemize}
+            \item Повышенная устойчивость обучения.
+            \item Снижение точности и увеличение времени сходимости.
+        \end{itemize}
+        \item \textbf{Альтернативная система ОДУ первого порядка:}
+        \begin{itemize}
+            \item Высокая точность.
+            \item Более стабильный процесс оптимизации.
+        \end{itemize}
+    \end{itemize}
+    \vspace{0.5cm}
+    Мы приглашаем заинтересованных исследователей использовать и развивать представленный подход.~\footfullcite{git}
+\end{frame}
+
+\printbibliography
+
+\end{document}
